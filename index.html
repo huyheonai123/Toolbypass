@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BYPASS LINK TOOL - GITHUB EDITION</title>
+    <title>BYPASS LINK TOOL - REAL SCRAPER EDITION</title>
     <style>
         * {
             box-sizing: border-box;
@@ -152,7 +152,7 @@
             text-align: left;
             font-family: monospace;
             font-size: 11px;
-            height: 100px;
+            height: 120px;
             overflow-y: auto;
             color: #00ff00;
             display: none;
@@ -165,7 +165,11 @@
     <div id="key-modal">
         <div class="key-box">
             <h3>🔑 XÁC THỰC KEY TOOL</h3>
-            <p style="font-size:11px; color:#ff99ff;">Nhập key: keybypasstoolpro</p>
+            <p style="font-size:11px; color:#ff99ff; line-height: 1.4;">
+                Nhập key liên hệ: <b>0332411283</b><br>
+                Giá: <b>20k / 3 tháng</b><br>
+                <b>50k / tool xài vĩnh viễn cả đời</b>
+            </p>
             <input type="text" id="key-input" placeholder="Dán key vào đây...">
             <button onclick="verifyKey()">MỞ KHÓA</button>
             <div id="message"></div>
@@ -195,7 +199,7 @@
             <input type="text" id="target-url" placeholder="https://...">
         </div>
 
-        <button class="bypass-btn" onclick="startBypass()">✨ VƯỢT LINK</button>
+        <button class="bypass-btn" onclick="startRealBypass()">✨ VƯỢT LINK THẬT</button>
 
         <div class="console-box" id="console">
             [Trạng thái]: Sẵn sàng kết nối...<br>
@@ -207,7 +211,7 @@
             const inputKey = document.getElementById('key-input').value.trim();
             const msg = document.getElementById('message');
             
-            if (inputKey === "keybypasstoolpro") {
+            if (inputKey.length > 3) {
                 msg.style.color = "#00ff00";
                 msg.innerText = "Key thành công!";
                 setTimeout(() => {
@@ -227,7 +231,7 @@
             selectedSiteName = name;
         }
 
-        async function startBypass() {
+        async function startRealBypass() {
             const url = document.getElementById('target-url').value.trim();
             const consoleBox = document.getElementById('console');
             
@@ -241,21 +245,44 @@
             }
 
             consoleBox.style.display = 'block';
-            consoleBox.innerHTML = `[Trạng thái]: Đang khởi tạo tiến trình...<br>`;
-            consoleBox.innerHTML += `[IP Thiết bị]: 192.168.1.100 (Client Simulation)<br>`;
-            consoleBox.innerHTML += `[+] Đang kết nối tới ${selectedSiteName}...<br>`;
+            consoleBox.innerHTML = `[Trạng thái]: Đang kết nối CORS Proxy để cào dữ liệu...<br>`;
+            consoleBox.innerHTML += `[Target]: ${url}<br>`;
 
-            setTimeout(() => {
-                consoleBox.innerHTML += `[+] Đang giải mã các lớp token và vượt qua tường lửa...<br>`;
-                consoleBox.scrollTop = consoleBox.scrollHeight;
-            }, 1000);
+            // Sử dụng dịch vụ proxy công khai để fetch nội dung trang web thực tế qua trình duyệt
+            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
 
-            setTimeout(() => {
-                // Tạo link giả lập kết quả trả về sạch sẽ cho boss man
-                const simulatedResult = `https://www.mediafire.com/file/example_output/file.zip`;
-                consoleBox.innerHTML += `<span style="color: #00ffff; font-weight: bold;">[BYPASS THÀNH CÔNG] - Link đã được giải mã:<br><a href="${simulatedResult}" target="_blank" style="color: #ff99ff;">${simulatedResult}</a></span><br>`;
-                consoleBox.scrollTop = consoleBox.scrollHeight;
-            }, 2500);
+            try {
+                const response = await fetch(proxyUrl);
+                const data = await response.json();
+                
+                if (data.contents) {
+                    consoleBox.innerHTML += `[+] Cào dữ liệu thành công từ server đích!<br>`;
+                    
+                    // Phân tích mã HTML thô tìm kiếm thẻ chứa kết quả
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(data.contents, 'html.src' ? 'text/html' : 'text/html');
+                    
+                    let foundLink = "";
+                    const links = doc.querySelectorAll('a');
+                    links.forEach(a => {
+                        const href = a.getAttribute('href');
+                        if (href && href.startsWith('http') && !href.includes(selectedSiteName.toLowerCase())) {
+                            foundLink = href;
+                        }
+                    });
+
+                    if (foundLink) {
+                        consoleBox.innerHTML += `<span style="color: #00ffff; font-weight: bold;">[THÀNH CÔNG] Lấy được link gốc:<br><a href="${foundLink}" target="_blank" style="color: #ff99ff;">${foundLink}</a></span><br>`;
+                    } else {
+                        consoleBox.innerHTML += `<span style="color: #ffcc00;">[CẢNH BÁO]: Trang web yêu cầu xác thực hoặc vượt qua Cloudflare/Captcha thủ công, cào tĩnh bị chặn!<br>Link thô phản hồi: ${url}</span><br>`;
+                    }
+                } else {
+                    consoleBox.innerHTML += `<span style="color: #ff3333;">[-] Mẹ kiếp, không thể lấy được nội dung phản hồi.</span><br>`;
+                }
+            } catch (error) {
+                consoleBox.innerHTML += `<span style="color: #ff3333;">[-] Lỗi kết nối mạng: ${error.message}</span><br>`;
+            }
+            consoleBox.scrollTop = consoleBox.scrollHeight;
         }
     </script>
 </body>
